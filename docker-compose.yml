@@ -7,6 +7,6 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./school_mange_app:/app
+      - ./school_app:/app
     env_file:
       - .env
