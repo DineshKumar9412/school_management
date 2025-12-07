@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  ### FASTAPI SERVICE ###
   app:
     container_name: school_app_container
     build: .
@@ -10,3 +11,39 @@ services:
       - ./school_app:/app
     env_file:
       - .env
+
+  ### LOKI ###
+  loki:
+    image: grafana/loki:3.6.0
+    container_name: loki
+    user: "0:0"
+    ports:
+      - "3100:3100"
+    volumes:
+      - /opt/loki/data:/loki
+      - /opt/loki/wal:/wal
+      - ./loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+
+  ### PROMTAIL ###
+  promtail:
+    image: grafana/promtail:3.6.0
+    container_name: promtail
+    user: "0:0"
+    volumes:
+      - /var/log:/var/log
+      - ./promtail-config.yaml:/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      - loki
+
+  ###  GRAFANA  ###
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin

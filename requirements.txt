@@ -3,3 +3,5 @@ uvicorn
 mysql-connector-python
 redis
 python-dotenv
+python-logging-loki
+python-json-logger
