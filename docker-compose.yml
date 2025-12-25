@@ -1,16 +1,7 @@
-services:
-  ### FASTAPI SERVICE ###
-  app:
-    container_name: school_app_container
-    build: .
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./school_app:/app
-    env_file:
-      - .env
+version: "3.8"
 
-  ### LOKI ###
+services:
+  # Loki for log aggregation
   loki:
     image: grafana/loki:3.6.0
     container_name: loki
@@ -23,7 +14,7 @@ services:
       - ./loki-config.yaml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
 
-  ### PROMTAIL ###
+  # Promtail to send logs to Loki
   promtail:
     image: grafana/promtail:3.6.0
     container_name: promtail
@@ -35,7 +26,7 @@ services:
     depends_on:
       - loki
 
-  ###  GRAFANA  ###
+  # Grafana for dashboards
   grafana:
     image: grafana/grafana:10.0.0
     container_name: grafana
@@ -44,7 +35,58 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on:
+      - loki
+
+  # Your main application
+  app:
+    container_name: school_app_container
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./school_app:/app
+    env_file:
+      - .env
+    depends_on:
+      - loki
+      - promtail
+
+  # PostgreSQL database for SonarQube
+  postgres:
+    image: postgres:15
+    container_name: sonarqube-postgres
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  # SonarQube for code quality
+  sonarqube:
+    image: sonarqube:10.4.1-community
+    container_name: sonarqube
+    depends_on:
+      - postgres
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    restart: always
+
+# Volumes for persistent data
 volumes:
   grafana-data:
+  postgres_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
