@@ -1,72 +1,92 @@
-# school_management
+# School Management
 
-# git clone
+A Dockerized school management system with FastAPI, PostgreSQL, Redis, Grafana, Loki, Promtail, and SonarQube.
+
+## Prerequisites
+
+* Ubuntu 20.04+
+* Git
+* Docker & Docker Compose
+
+## 1. Clone the Repository
+
 git clone https://github.com/DineshKumar9412/school_management.git
-
-# install docker
-sudo apt update
-sudo apt upgrade -y
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-  https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
-  | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io
-sudo apt update
-sudo apt install -y docker-compose-plugin
-
-docker compose version
-docker --version
-
-# chnage direcory
 cd school_management
 
-# .env file creation
+## 2. Install Docker and Docker Compose
+
+
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release
+
+# Add Docker GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Add Docker repository
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+Check installation:
+docker --version
+docker compose version
+
+
+## 3. Create `.env` File
+
+Create a `.env` file in the project root:
+
 DB_USER="root"
 DB_PASSWORD="root@123"
 DB_HOST="3.110.91.230"
 DB_NAME="sampledb"
+
 REDIS_HOST="3.110.91.230"
 REDIS_PORT="6379"
 REDIS_PASSWORD="Redis@123"
 
-# sonerquser chnages
-# Run this once on the host:
+
+## 4. Configure SonarQube
+
+Set the `vm.max_map_count` for SonarQube:
+
+# Temporary
 sudo sysctl -w vm.max_map_count=524288
 
-# Make it permanent:
+# Permanent
 echo "vm.max_map_count=524288" | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 
-# docker run
+## 5. Run Docker Compose
+
+Start all services:
 sudo docker compose up -d
-docker compose up loki
+
+Build the app container if needed:
 docker compose build
 
+Check logs for troubleshooting:
+docker compose logs -f
 
-# docker check 
+Check running containers:
 sudo docker ps
 
-# docker down 
+Stop all services:
 sudo docker compose down
 
-# docker log 
+## 6. Access Applications
 
+* **FastAPI Docs:** `http://<server-ip>:8000/docs`
+* **Grafana:** `http://<server-ip>:3000`
+* **SonarQube:** `http://<server-ip>:9000`
 
-# check FASTAPI 
-serverip : 8000/docs
+> **Note:** To connect Grafana to Loki, add the Loki endpoint: `http://loki:3100`.
 
-# check Grafan 
-serverip : 3000
+## 7. Additional Notes
 
-ad loki endpoint to ad source 
-http://loki:3100
-
-
-
-
-
-
+* Ensure volumes are persisted correctly for Grafana, SonarQube, and Loki.
+* Adjust `.env` file as needed for your database and Redis credentials.
 
