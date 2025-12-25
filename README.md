@@ -30,7 +30,7 @@ docker compose version
 
 ## 3. Create `.env` File
 
-Create a `.env` file in the project root:
+# Create a `.env` file in the project root:
 
 DB_USER="root"
 DB_PASSWORD="root@123"
@@ -55,19 +55,19 @@ sudo sysctl -p
 
 ## 5. Run Docker Compose
 
-Start all services:
+# Start all services:
 sudo docker compose up -d
 
-Build the app container if needed:
+# Build the app container if needed:
 docker compose build
 
-Check logs for troubleshooting:
+# Check logs for troubleshooting:
 docker compose logs -f
 
-Check running containers:
+# Check running containers:
 sudo docker ps
 
-Stop all services:
+# Stop all services:
 sudo docker compose down
 
 ## 6. Access Applications
