@@ -11,63 +11,77 @@ A Dockerized school management system with FastAPI, PostgreSQL, Redis, Grafana, 
 ## 1. Clone the Repository
 
 git clone https://github.com/DineshKumar9412/school_management.git
+
+### Change Dirctory
 cd school_management
 
 ## 2. Install Docker and Docker Compose
 
 sudo apt update && sudo apt upgrade -y
+
 sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release
+
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
 https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 sudo apt update
+
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-# Check installation:
+### Check installation:
 docker --version
+
 docker compose version
 
 
 ## 3. Create `.env` File
 
-# Create a `.env` file in the project root:
+### Create a `.env` file in the project root:
 
 DB_USER="root"
+
 DB_PASSWORD="root@123"
+
 DB_HOST="3.110.91.230"
+
 DB_NAME="sampledb"
 
 REDIS_HOST="3.110.91.230"
+
 REDIS_PORT="6379"
+
 REDIS_PASSWORD="Redis@123"
 
 
 ## 4. Configure SonarQube
 
-Set the `vm.max_map_count` for SonarQube:
+### Set the `vm.max_map_count` for SonarQube:
 
-# Temporary
+### Temporary
 sudo sysctl -w vm.max_map_count=524288
 
-# Permanent
+### Permanent
 echo "vm.max_map_count=524288" | sudo tee -a /etc/sysctl.conf
+
 sudo sysctl -p
 
 ## 5. Run Docker Compose
 
-# Start all services:
+### Start all services:
 sudo docker compose up -d
 
-# Build the app container if needed:
+### Build the app container if needed:
 docker compose build
 
-# Check logs for troubleshooting:
+### Check logs for troubleshooting:
 docker compose logs -f
 
-# Check running containers:
+### Check running containers:
 sudo docker ps
 
-# Stop all services:
+### Stop all services:
 sudo docker compose down
 
 ## 6. Access Applications
