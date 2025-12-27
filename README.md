@@ -8,14 +8,14 @@ A Dockerized school management system with FastAPI, PostgreSQL, Redis, Grafana, 
 * Git
 * Docker & Docker Compose
 
-## 1. Clone the Repository
+## 1️⃣. Clone the Repository
 
 git clone https://github.com/DineshKumar9412/school_management.git
 
 ### Change Dirctory
 cd school_management
 
-## 2. Install Docker and Docker Compose
+## 2️⃣. Install Docker and Docker Compose
 
 sudo apt update && sudo apt upgrade -y
 
@@ -36,7 +36,7 @@ docker --version
 docker compose version
 
 
-## 3. Create `.env` File
+## 3️⃣. Create `.env` File
 
 ### Create a `.env` file in the project root:
 
@@ -55,7 +55,7 @@ REDIS_PORT="6379"
 REDIS_PASSWORD="Redis@123"
 
 
-## 4. Configure SonarQube
+## 4️⃣. Configure SonarQube
 
 ### Set the `vm.max_map_count` for SonarQube:
 
@@ -67,7 +67,7 @@ echo "vm.max_map_count=524288" | sudo tee -a /etc/sysctl.conf
 
 sudo sysctl -p
 
-## 5. Run Docker Compose
+## 5️⃣. Run Docker Compose
 
 ### Start all services:
 sudo docker compose up -d
@@ -84,7 +84,27 @@ sudo docker ps
 ### Stop all services:
 sudo docker compose down
 
-## 6. Access Applications
+## single app test
+### Rebuild the Docker image:
+
+sudo docker compose build app
+
+### Restart the containers:
+
+sudo docker compose up -d
+
+### Check the container logs to make sure there are no import errors:
+
+sudo docker logs school_app_container
+
+## Important: If you add or update any requirements.txt file, you should run:  
+
+sudo docker compose build app
+
+### check Log
+sudo docker logs school_app_container
+
+## 6️⃣. Access Applications
 
 * **FastAPI Docs:** `http://<server-ip>:8000/docs`
 * **Grafana:** `http://<server-ip>:3000`
@@ -92,8 +112,41 @@ sudo docker compose down
 
 > **Note:** To connect Grafana to Loki, add the Loki endpoint: `http://loki:3100`.
 
-## 7. Additional Notes
+## 7️⃣. Additional Notes
 
 * Ensure volumes are persisted correctly for Grafana, SonarQube, and Loki.
 * Adjust `.env` file as needed for your database and Redis credentials.
+
+## 8️⃣ Without Docker how to check
+
+### instal python 3.10
+sudo apt update
+
+sudo apt install software-properties-common -y
+
+sudo add-apt-repository ppa:deadsnakes/ppa
+
+sudo apt update
+
+sudo apt install python3.10 python3.10-venv python3.10-dev -y
+
+python3.10 --version
+
+### create a ENV
+#### Create a virtual environment named 'school_env' using Python 3.10
+python3.10 -m venv school_env
+
+source school_env/bin/activate
+#### Upgrade pip to the latest version
+pip install --upgrade pip
+#### Install all dependencies listed in requirements.txt
+pip install -r requirements.txt
+#### Run the FastAPI app using Uvicorn on all network interfaces (0.0.0.0) at port 8000
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+#### List all processes listening on network ports (to check if your app is running)
+sudo lsof -i -P -n | grep LISTEN
+
+9️⃣
+🔟
+
 
