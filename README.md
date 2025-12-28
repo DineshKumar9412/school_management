@@ -122,8 +122,11 @@ sudo docker logs school_app_container
 * **FastAPI Docs:** `http://<server-ip>:8000/docs`
 * **Grafana:** `http://<server-ip>:3000`
 * **SonarQube:** `http://<server-ip>:9000`
+* **Prometheus:** `http://<server-ip>:9090`
 
 > **Note:** To connect Grafana to Loki, add the Loki endpoint: `http://loki:3100`.
+
+> **Note:** To connect Grafana to Prometheus, add the Prometheus endpoint: `http://prometheus:9090`.
 
 ## 7️⃣. Additional Notes
 
