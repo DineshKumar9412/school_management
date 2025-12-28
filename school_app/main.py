@@ -1,77 +1,54 @@
-import os
-import json
-from decimal import Decimal
-from fastapi import FastAPI
-import mysql.connector
-from mysql.connector import Error
-import redis
-
-app = FastAPI()
-
-db_config = {
-    "host": os.getenv("DB_HOST", ""),
-    "user": os.getenv("DB_USER", ""),
-    "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", ""),
-}
-
-redis_client = redis.Redis(
-    host=os.getenv("REDIS_HOST", ""),
-    port=int(os.getenv("REDIS_PORT", 6379)),
-    password=os.getenv("REDIS_PASSWORD", ""),
-    decode_responses=True,
-)
+# api/main.py
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from sqladmin import Admin
+from database.session import engine
+from api.users import router as user_router
+from admin.user_admin import UserAdmin
+from middleware.cors import setup_cors
+from middleware.decryption import DecryptionMiddleware
+from middleware.encryption import EncryptionMiddleware
+from middleware.logging import LoggingMiddleware
+from middleware.logging import loki_logger
 
 
-def convert_decimal(obj):
-    if isinstance(obj, Decimal):
-        return float(obj)
-    if isinstance(obj, dict):
-        return {k: convert_decimal(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [convert_decimal(i) for i in obj]
-    return obj
+app = FastAPI(title="FastAPI Production App")
 
-@app.get("/employee/{name}")
-def get_employee(name: str):
-    # Try cache first
-    cached = redis_client.get(name)
-    if cached:
-        return {"employee": json.loads(cached), "source": "redis"}
+# Middleware Setup
+# 1️⃣ CORS
+setup_cors(app)
 
-    connection = None
-    cursor = None
+# 2️⃣ Decrypt incoming requests (only selected paths)
+app.add_middleware(DecryptionMiddleware)
 
+# 3️⃣ Logging middleware for request/response metadata
+app.add_middleware(LoggingMiddleware)
+
+# 4️⃣ Encrypt outgoing responses (only selected paths)
+app.add_middleware(EncryptionMiddleware)
+
+# 5️⃣ Catch all unhandled exceptions and log
+@app.middleware("http")
+async def catch_exceptions_middleware(request: Request, call_next):
     try:
-        connection = mysql.connector.connect(**db_config)
-        cursor = connection.cursor(dictionary=True)
+        return await call_next(request)
+    except Exception as e:
+        loki_logger.error(
+            "Unhandled exception occurred",
+            extra={
+                "path": request.url.path,
+                "method": request.method,
+                "error": str(e)
+            }
+        )
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error"}
+        )
 
-        cursor.execute("SELECT * FROM employees WHERE name = %s", (name,))
-        result = cursor.fetchone()
+# API Routes
+app.include_router(user_router, prefix="/api/users")
 
-        if result:
-            result = convert_decimal(result)
-
-            # Cache the result for 60 seconds
-            redis_client.setex(name, 60, json.dumps(result))
-
-            return {"employee": result, "source": "mysql"}
-
-        return {"message": f"No employee found with name '{name}'"}
-
-    except Error as e:
-        return {"error": str(e)}
-
-    finally:
-        if cursor:
-            cursor.close()
-        if connection and connection.is_connected():
-            connection.close()
-
-@app.get("/")
-def root():
-    return {"message": "FastAPI is running!"}
-
-
-
-
+# Admin Panel
+admin = Admin(app, engine)
+admin.add_view(UserAdmin)

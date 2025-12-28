@@ -54,6 +54,10 @@ REDIS_PORT="6379"
 
 REDIS_PASSWORD="Redis@123"
 
+KEY="MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+
+IV="YWJjZGVmOTg3NjU0MzIxMA=="
+
 
 ## 4️⃣. Configure SonarQube
 
@@ -73,10 +77,10 @@ sudo sysctl -p
 sudo docker compose up -d
 
 ### Build the app container if needed:
-docker compose build
+sudo docker compose build
 
 ### Check logs for troubleshooting:
-docker compose logs -f
+sudo docker compose logs -f
 
 ### Check running containers:
 sudo docker ps
@@ -96,6 +100,7 @@ sudo docker compose up -d
 ### Check the container logs to make sure there are no import errors:
 
 sudo docker logs school_app_container
+sudo docker logs -f --tail 100 school_app_container
 
 ## Important: If you add or update any requirements.txt file, you should run:  
 
