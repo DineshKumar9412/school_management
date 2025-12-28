@@ -10,10 +10,12 @@ from middleware.decryption import DecryptionMiddleware
 from middleware.encryption import EncryptionMiddleware
 from middleware.logging import LoggingMiddleware
 from middleware.logging import loki_logger
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from fastapi.responses import Response
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+
 
 app = FastAPI(title="FastAPI Production App")
+
 
 # Middleware Setup
 # 1️⃣ CORS
