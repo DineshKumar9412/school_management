@@ -18,10 +18,10 @@ async def get_users(db: AsyncSession = Depends(get_db)):
 
 @router.post("/new/")
 async def post_users_value(item: UserCreate, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User))
-    return result.scalars().all()
+    return Result(200, "success", item.model_dump()
+                  ).http_response()
 
 @router.get("/get_value/")
 def get_value(name: str = Query(...), email: str = Query(...)):
-    1/0
-    return Result(200, "success", {"name": name, "email": email}).http_response()
+    return Result(200, "success", {"name": name, "email": email}
+                  ).http_response()
