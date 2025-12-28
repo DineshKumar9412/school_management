@@ -11,3 +11,4 @@ sqlalchemy
 aiomysql
 cryptography
 pydantic[email]
+prometheus-client

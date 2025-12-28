@@ -19,6 +19,9 @@ class DecryptionMiddleware(BaseHTTPMiddleware):
 
         if request.url.path not in ENCRYPTED_PATHS:
             return await call_next(request)
+        
+        if request.url.path == "/metrics":
+            return await call_next(request)
 
         body = await request.body()
 

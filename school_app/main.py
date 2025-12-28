@@ -10,7 +10,8 @@ from middleware.decryption import DecryptionMiddleware
 from middleware.encryption import EncryptionMiddleware
 from middleware.logging import LoggingMiddleware
 from middleware.logging import loki_logger
-
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from fastapi.responses import Response
 
 app = FastAPI(title="FastAPI Production App")
 
@@ -52,3 +53,10 @@ app.include_router(user_router, prefix="/api/users")
 # Admin Panel
 admin = Admin(app, engine)
 admin.add_view(UserAdmin)
+
+@app.get("/metrics", include_in_schema=False)
+def metrics():
+    return Response(
+        generate_latest(),
+        media_type=CONTENT_TYPE_LATEST
+    )

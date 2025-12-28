@@ -6,12 +6,12 @@ from security.helper import DECRYPTED_PATHS
 import base64
 import json
 from security.crypto import encrypt_json
+import os
 
 
 # Base64-encoded AES-256 key (32 bytes) and IV (16 bytes)
-key_b64 = "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
-iv_b64  = "YWJjZGVmOTg3NjU0MzIxMA=="
-
+key_b64 = os.getenv("KEY", "")
+iv_b64  = os.getenv("IV", "")
 key = base64.b64decode(key_b64)
 iv  = base64.b64decode(iv_b64)
 
@@ -23,6 +23,9 @@ class EncryptionMiddleware(BaseHTTPMiddleware):
         # Only encrypt specific paths
         if request.url.path not in DECRYPTED_PATHS:
             return response
+        
+        if request.url.path == "/metrics":
+            return await call_next(request)
 
         # Read the original response body
         body = b""
