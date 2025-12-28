@@ -107,6 +107,7 @@ sudo docker compose up -d
 ### Check the container logs to make sure there are no import errors:
 
 sudo docker logs school_app_container
+
 sudo docker logs -f --tail 100 school_app_container
 
 ## Important: If you add or update any requirements.txt file, you should run:  
