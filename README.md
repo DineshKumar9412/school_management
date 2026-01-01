@@ -42,7 +42,6 @@ docker --version
 
 docker compose version
 
-
 ## 3️⃣. Create `.env` File
 
 ### Create a `.env` file in the project root:
@@ -65,20 +64,7 @@ KEY="MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
 
 IV="YWJjZGVmOTg3NjU0MzIxMA=="
 
-
-## 4️⃣. Configure SonarQube
-
-### Set the `vm.max_map_count` for SonarQube:
-
-### Temporary
-sudo sysctl -w vm.max_map_count=524288
-
-### Permanent
-echo "vm.max_map_count=524288" | sudo tee -a /etc/sysctl.conf
-
-sudo sysctl -p
-
-## 5️⃣. Run Docker Compose
+## 4️⃣. Run Docker Compose 
 
 ### Start all services:
 sudo docker compose up -d
@@ -95,6 +81,8 @@ sudo docker ps
 ### Stop all services:
 sudo docker compose down
 
+sudo docker compose down -v
+
 ## single app test
 ### Rebuild the Docker image:
 
@@ -110,6 +98,8 @@ sudo docker logs school_app_container
 
 sudo docker logs -f --tail 100 school_app_container
 
+sudo docker logs -f sonarqube
+
 ## Important: If you add or update any requirements.txt file, you should run:  
 
 sudo docker compose build app
@@ -117,7 +107,7 @@ sudo docker compose build app
 ### check Log
 sudo docker logs school_app_container
 
-## 6️⃣. Access Applications
+## 5️⃣. Access Applications 
 
 * **FastAPI Docs:** `http://<server-ip>:8000/docs`
 * **Grafana:** `http://<server-ip>:3000`
@@ -128,12 +118,12 @@ sudo docker logs school_app_container
 
 > **Note:** To connect Grafana to Prometheus, add the Prometheus endpoint: `http://prometheus:9090`.
 
-## 7️⃣. Additional Notes
+## 6️⃣. Additional Notes 
 
 * Ensure volumes are persisted correctly for Grafana, SonarQube, and Loki.
 * Adjust `.env` file as needed for your database and Redis credentials.
 
-## 8️⃣ Without Docker how to check
+## 7️⃣ Without Docker how to check 
 
 ### instal python 3.10
 sudo apt update
@@ -161,7 +151,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 #### List all processes listening on network ports (to check if your app is running)
 sudo lsof -i -P -n | grep LISTEN
-
+8️⃣
 9️⃣
 🔟
 
