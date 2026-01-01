@@ -8,10 +8,7 @@ from admin.user_admin import UserAdmin
 from middleware.cors import setup_cors
 from middleware.decryption import DecryptionMiddleware
 from middleware.encryption import EncryptionMiddleware
-from middleware.logging import LoggingMiddleware
-from middleware.logging import loki_logger
-from fastapi.responses import Response
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from middleware.monitoring import MonitoringMiddleware, metrics_endpoint, loki_logger
 
 
 app = FastAPI(title="FastAPI Production App")
@@ -25,7 +22,7 @@ setup_cors(app)
 app.add_middleware(DecryptionMiddleware)
 
 # 3️⃣ Logging middleware for request/response metadata
-app.add_middleware(LoggingMiddleware)
+app.add_middleware(MonitoringMiddleware)
 
 # 4️⃣ Encrypt outgoing responses (only selected paths)
 app.add_middleware(EncryptionMiddleware)
@@ -58,7 +55,4 @@ admin.add_view(UserAdmin)
 
 @app.get("/metrics", include_in_schema=False)
 def metrics():
-    return Response(
-        generate_latest(),
-        media_type=CONTENT_TYPE_LATEST
-    )
+    return metrics_endpoint()  
