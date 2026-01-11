@@ -35,4 +35,4 @@ limits_config:
 
 table_manager:
   retention_deletes_enabled: true
-  retention_period: 24h
+  retention_period: 168h   # change to 2160h for prod (90 days)

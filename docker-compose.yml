@@ -1,21 +1,21 @@
 services:
-  # Loki for log aggregation
+  # Loki for logs
   loki:
     image: grafana/loki:3.6.0
-    container_name: loki
+    container_name: loki_preprod
     user: "0:0"
     ports:
       - "3100:3100"
     volumes:
-      - /opt/loki/data:/loki
-      - /opt/loki/wal:/wal
       - ./loki-config.yaml:/etc/loki/local-config.yaml
+      - ./loki-data-preprod:/loki
+      - ./loki-wal-preprod:/wal
     command: -config.file=/etc/loki/local-config.yaml
 
-  # Promtail for system logs
+  # Promtail to ship system logs
   promtail:
     image: grafana/promtail:3.6.0
-    container_name: promtail
+    container_name: promtail_preprod
     user: "0:0"
     volumes:
       - /var/log:/var/log
@@ -27,36 +27,40 @@ services:
   # Prometheus for metrics
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: prometheus_preprod
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus-data-preprod:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.retention.time=7d'
 
-  # System metrics exporter
+  # Node exporter for system metrics
   node_exporter:
     image: prom/node-exporter:latest
-    container_name: node_exporter
+    container_name: node_exporter_preprod
     ports:
       - "9100:9100"
 
   # Grafana dashboards
   grafana:
     image: grafana/grafana:10.0.0
-    container_name: grafana
+    container_name: grafana_preprod
     ports:
       - "3000:3000"
     volumes:
-      - grafana-data:/var/lib/grafana
+      - grafana-data-preprod:/var/lib/grafana
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
     depends_on:
       - loki
       - prometheus
 
-  # FastAPI application
+  # FastAPI app
   app:
-    container_name: school_app_container
+    container_name: school_app_preprod
     build: .
     ports:
       - "8000:8000"
@@ -68,4 +72,4 @@ services:
       - loki
 
 volumes:
-  grafana-data:
+  grafana-data-preprod:
